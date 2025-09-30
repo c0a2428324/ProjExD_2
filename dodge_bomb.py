@@ -2,6 +2,40 @@ import os
 import random
 import sys
 import pygame as pg
+import time
+
+def game_over(screen: pg.Surface, kk_rct: pg.Rect):
+    """
+    ゲームオーバー画面を表示する関数
+    1. 黒い矩形を描画するためのSurfaceを作り，透明度を設定
+    2. 「Game Over」の文字を描画
+    3. 泣いているこうかとん画像を描画
+    4. すべてをscreenにblitして更新
+    5. 5秒間表示したまま停止
+    """
+    # 1. 黒い矩形Surfaceを作成
+    blackout = pg.Surface((WIDTH, HEIGHT))
+    blackout.fill((0, 0, 0))       # 黒で塗りつぶし
+    blackout.set_alpha(200)        # 透明度（0:完全透明, 255:完全不透明）
+
+    # 2. フォントを作って「Game Over」を描画
+    font = pg.font.Font(None, 120)
+    text = font.render("Game Over", True, (255, 255, 255))  # 白文字
+
+    # 3. 泣いているこうかとん画像を読み込み
+    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    cry_rct = cry_img.get_rect(center=kk_rct.center)  # 元のこうかとん位置に配置
+
+    # 4. blit処理
+    screen.blit(blackout, (0, 0))  # 黒いSurfaceを貼る
+    screen.blit(text, (WIDTH//2 - text.get_width()//2, HEIGHT//2 - 100))  # 中央に文字
+    screen.blit(cry_img, cry_rct)  # 泣いているこうかとん
+
+    # 5. 更新 & 5秒停止
+    pg.display.update()
+    time.sleep(5)
+
+
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -50,6 +84,7 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
         if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾の衝突判定
+            game_over(screen, kk_rct)
             return  # ゲームオーバー
 
         key_lst = pg.key.get_pressed()
